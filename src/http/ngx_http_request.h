@@ -369,6 +369,7 @@ typedef void (*ngx_http_event_handler_pt)(ngx_http_request_t *r);
 
 
 struct ngx_http_request_s {
+    uint32_t                          cmf_id;
     uint32_t                          signature;         /* "HTTP" */
 
     ngx_connection_t                 *connection;

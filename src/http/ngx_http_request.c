@@ -558,6 +558,12 @@ ngx_http_alloc_request(ngx_connection_t *c)
         return NULL;
     }
 
+    static uint32_t next_id = 1;
+
+    printf("ALLOCATING|%p|%u\n", &r, next_id);
+
+    r->cmf_id = next_id++;
+
     r->pool = pool;
 
     r->http_connection = hc;
@@ -630,6 +636,8 @@ ngx_http_alloc_request(ngx_connection_t *c)
     r->http_state = NGX_HTTP_READING_REQUEST_STATE;
 
     r->log_handler = ngx_http_log_error_handler;
+
+    printf("ALLOCATED|%p|%u\n", &r, r->cmf_id);
 
     return r;
 }
@@ -3571,6 +3579,7 @@ ngx_http_close_request(ngx_http_request_t *r, ngx_int_t rc)
 void
 ngx_http_free_request(ngx_http_request_t *r, ngx_int_t rc)
 {
+    printf("FREEING|%p|%u\n", &r, r->cmf_id);
     ngx_log_t                 *log;
     ngx_pool_t                *pool;
     struct linger              linger;
@@ -3645,6 +3654,9 @@ ngx_http_free_request(ngx_http_request_t *r, ngx_int_t rc)
     r->request_line.len = 0;
 
     r->connection->destroyed = 1;
+
+    printf("FREED|%p|%u\n", &r, r->cmf_id);
+    fflush(stdout);
 
     /*
      * Setting r->pool to NULL will increase probability to catch double close
